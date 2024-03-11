@@ -17,10 +17,4 @@
 
 * Audit Logs: A record of all changes and updates made to the ArgoCD server and applications.
 
-# Procedures for adding APPS or REPOSITORIES:
-
-* Go on GITLAB -> projects: https://gitlab.private.uae/gitlab/sysops ->  choose environment -> add application or repositories -> SYNC in "argo-itself-test" application
-
-* A new repository or application will be configured
-
 
