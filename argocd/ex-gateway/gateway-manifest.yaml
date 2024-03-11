@@ -1,0 +1,81 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: bo-gateway
+  namespace: -pnrr-prod
+spec:
+  replicas: 4
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: bo-gateway
+  template:
+    metadata:
+      labels:
+       app: bo-gateway
+    spec:
+      containers:
+      - name: bo-gateway
+          image: nexus-private.uae/repository/repository/images-prod/bo-gateway:0.1.2
+        resources:
+          limits:
+            memory: 2500Mi
+            cpu: 2000m
+          requests:
+            memory: 2500Mi
+            cpu: 2000m
+        ports:
+          - containerPort: 8969
+            name: http-bo-front
+        envFrom:
+        - configMapRef:
+            name: bo-gateway-cm
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 8969
+          initialDelaySeconds: 10
+          periodSeconds: 20
+          timeoutSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: / 
+            port: 8969
+          initialDelaySeconds: 10
+          periodSeconds: 20
+          timeoutSeconds: 10
+  strategy:
+    blueGreen: 
+      activeService: bo-gateway-active-svc
+      previewService: bo-gateway-preview-svc
+#      autoPromotionEnabled: true
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: bo-gateway-active-svc
+  namespace: -pnrr-prod
+  labels:
+    app: bo-gateway  
+spec:
+  ports:
+    - port: 80
+      targetPort: 8969
+      name: http-bo-front
+  selector:
+    app: bo-gateway
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: bo-gateway-preview-svc
+  namespace: -pnrr-prod
+  labels:
+    app: bo-gateway 
+spec:
+  ports:
+    - port: 80
+      targetPort: 8969
+      name: http-bo-front
+  selector:
+    app: bo-gateway

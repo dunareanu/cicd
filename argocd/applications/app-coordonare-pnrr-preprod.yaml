@@ -1,0 +1,19 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ex-app-prod
+  namespace: argocd-2415
+spec:
+  project: default
+  source:
+    repoURL: 'https://gitlab.private.uae/gitlab/pnrr/sysops/ex-app.git'
+    path: .
+    targetRevision: HEAD
+    directory:
+      recurse: true
+      jsonnet: {}
+  destination:
+    server: 'https://kubernetes.default.eks.svc'
+    namespace: ex-app-prod
+  syncPolicy:
+    automated: {}
